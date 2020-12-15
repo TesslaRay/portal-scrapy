@@ -1,11 +1,12 @@
 const puppeteer = require("puppeteer");
 
-console.log("Start scrap from Portal Innobiliaro ");
+console.log("Start scrap from Portal Inmobiliaro ");
 
 /**
  * Scrapping from webpage from CEN
  */
-async function scracpPortal() {
+
+async function scrapPropertyFromUrl(url) {
   try {
     let browser = await puppeteer.launch({
       args: [
@@ -17,41 +18,63 @@ async function scracpPortal() {
         "--ignore-certifcate-errors-spki-list",
         "--incognito",
       ],
-      headless: false,
+      headless: true,
     });
 
     let page = await browser.newPage();
 
-    await page.goto(
-      `https://www.portalinmobiliario.com/MLC-554358008-las-tranqueras-830-las-condes-region-metropolitana-chile-_JM#position=41&type=item&tracking_id=6b204cc7-856d-465b-8217-58ab2aded5f9`
+    await page.goto(url);
+
+    const tittle = await page.evaluate(
+      () => document.querySelector(`h1.item-title__primary`).textContent
     );
 
-    // await page.goto(
-    //   `https://www.portalinmobiliario.com/venta/departamento/nunoa-metropolitana/9424-manuel-montt-2630-nva#carousel=featured_projects`
-    // );
+    console.log(tittle);
+    console.log(`url: ${url}`);
 
-    // await page.goto(
-    //   `https://www.portalinmobiliario.com/MLC-567015565-cardenal-newman-900-las-condes-chile-_JM#position=4&type=item&tracking_id=3779a1c8-a64d-400c-87db-513a5b6afeb5`
-    // );
+    const address = await page.evaluate(
+      () => document.querySelector(`h2.map-address`).textContent
+    );
 
-    const spanTexts = await page.$$eval(
+    console.log(address);
+
+    const prizeUF = await page.$$eval(".item-price  * span", (elements) =>
+      elements.map((el) => el.innerText)
+    );
+
+    console.log(prizeUF);
+
+    const attributes = await page.$$eval(".item-attributes  * dd", (elements) =>
+      elements.map((el) => el.innerText)
+    );
+
+    console.log(attributes);
+
+    const sellerName = await page.$$eval(
       ".vip-section-seller-info * span",
       (elements) => elements.map((el) => el.innerText)
     );
 
-    if (spanTexts.length > 1) {
-      console.log(`Vendido por: ${spanTexts[0]}`);
+    if (sellerName.length > 1) {
+      console.log(`Vendido por: ${sellerName[0]}`);
+      const daysInPlatform = await page.evaluate(
+        () => document.querySelector(`p.info`).textContent
+      );
+
+      var date1 = new Date(fixDate(daysInPlatform));
+      var date2 = new Date();
+
+      // To calculate the time difference of two dates
+      let diferenceInTime = parseInt(
+        Math.abs(date1 - date2) / (1000 * 60 * 60 * 24)
+      );
+
+      console.log(`Días en la plataforma: ${diferenceInTime}`);
     } else {
       console.log("Vendido por Corredora o Inmobiliaria");
     }
 
-    await sleep(3000);
-    await page.click('a[id="showPhoneSuperior"]');
-    await page.click('a[id="showPhoneSuperior"]');
-
-    // await page.click('div[id="Heading3"]');
-
-    // await browser.close();
+    await browser.close();
     console.log("Browser closed");
   } catch (err) {
     console.log("pasa por aca?");
@@ -62,7 +85,13 @@ async function action() {
   /**
    * Scrap Portal Inmobiliario web page
    */
-  await scracpPortal();
+
+  let url = `https://www.portalinmobiliario.com/venta/departamento/nunoa-metropolitana/9424-manuel-montt-2630-nva#carousel=featured_projects`;
+
+  // let url = `https://www.portalinmobiliario.com/MLC-554358008-las-tranqueras-830-las-condes-region-metropolitana-chile-_JM#position=41&type=item&tracking_id=6b204cc7-856d-465b-8217-58ab2aded5f9`;
+
+  // let url = `https://www.portalinmobiliario.com/MLC-567015565-cardenal-newman-900-las-condes-chile-_JM#position=4&type=item&tracking_id=3779a1c8-a64d-400c-87db-513a5b6afeb5`;
+  await scrapPropertyFromUrl(url);
 }
 
 action();
@@ -71,4 +100,25 @@ function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+// Fix date from Portal Inmobiliario to Date method
+function fixDate(dateToFix) {
+  let fixDate = dateToFix.replace(/-/g, "/");
+  let aux = fixDate[3];
+  let aux2 = fixDate[4];
+
+  let fix1Date = setCharAt(fixDate, 3, fixDate[0]);
+  let fix2Date = setCharAt(fix1Date, 4, fix1Date[1]);
+
+  let fix3Date = setCharAt(fix2Date, 0, aux);
+  let fix4Date = setCharAt(fix3Date, 1, aux2);
+
+  return fix4Date;
+}
+
+// Replace any character in any string at specified position
+function setCharAt(str, index, chr) {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + chr + str.substring(index + 1);
 }
