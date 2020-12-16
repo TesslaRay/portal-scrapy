@@ -1,11 +1,11 @@
 const puppeteer = require("puppeteer");
+navigate = require("./navigate.js");
 
 console.log("Start scrap from Portal Inmobiliaro ");
 
 /**
- * Scrapping from webpage from CEN
+ * Scrapping from webpage from Portal Inmobiliario
  */
-
 async function scrapPropertyFromUrl(url) {
   try {
     let browser = await puppeteer.launch({
@@ -86,12 +86,11 @@ async function action() {
    * Scrap Portal Inmobiliario web page
    */
 
-  let url = `https://www.portalinmobiliario.com/venta/departamento/nunoa-metropolitana/9424-manuel-montt-2630-nva#carousel=featured_projects`;
-
-  // let url = `https://www.portalinmobiliario.com/MLC-554358008-las-tranqueras-830-las-condes-region-metropolitana-chile-_JM#position=41&type=item&tracking_id=6b204cc7-856d-465b-8217-58ab2aded5f9`;
-
-  // let url = `https://www.portalinmobiliario.com/MLC-567015565-cardenal-newman-900-las-condes-chile-_JM#position=4&type=item&tracking_id=3779a1c8-a64d-400c-87db-513a5b6afeb5`;
-  await scrapPropertyFromUrl(url);
+  let linkPage = await navigate();
+  console.log(linkPage[0].url);
+  for (let i = 0; i < linkPage.length; i++) {
+    await scrapPropertyFromUrl(linkPage[i].url);
+  }
 }
 
 action();
