@@ -1,7 +1,9 @@
 const puppeteer = require("puppeteer");
 
 /**
- * Scrapping from webpage from Portal Inmobiliario
+ * Scrapping from Portal Inmobiliario
+ * @description Scrarp information from Portal Inmobiliario
+ * @param {String} url - url from Portal Inmobiliario
  */
 module.exports = async function scrapPropertyFromUrl(url) {
   try {
@@ -66,15 +68,16 @@ module.exports = async function scrapPropertyFromUrl(url) {
         Math.abs(date1 - date2) / (1000 * 60 * 60 * 24)
       );
 
-      console.log(`Días en la plataforma: ${diferenceInTime}`);
+      console.log(`Días en la plataforma: ${diferenceInTime}\n`);
     } else {
-      console.log("Vendido por Corredora o Inmobiliaria");
+      console.log("Vendido por Corredora o Inmobiliaria \n");
     }
 
     await browser.close();
-    console.log("Browser closed");
+    console.log("Browser closed, scrarp information from URL");
   } catch (err) {
-    console.log("pasa por aca?");
+    console.log("Error in scrapPropertyFromUrl");
+    console.log(err);
   }
 };
 

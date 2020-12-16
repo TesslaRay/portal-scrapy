@@ -1,8 +1,15 @@
 const puppeteer = require("puppeteer");
 
-module.exports = async function navigate() {
+let firstUrl = `https://www.portalinmobiliario.com/venta/departamento/propiedades-usadas/santiago-metropolitana`;
+
+/**
+ * Create route to navigate in Portal Inmobiliario
+ * @description Create route to navigate in Portal Inmobiliario
+ */
+
+module.exports = async function createRoute() {
   try {
-    console.log("Navigate function");
+    console.log("Create route to scrap...");
     let browser = await puppeteer.launch({
       args: [
         "--no-sandbox",
@@ -18,9 +25,7 @@ module.exports = async function navigate() {
 
     let page = await browser.newPage();
 
-    await page.goto(
-      `https://www.portalinmobiliario.com/venta/departamento/propiedades-usadas/santiago-metropolitana`
-    );
+    await page.goto(firstUrl);
 
     let dataPortal = await page.evaluate(() => {
       let propertyList = document.querySelectorAll(
@@ -36,7 +41,11 @@ module.exports = async function navigate() {
       return results;
     });
 
-    console.log(dataPortal);
+    const type = await page.evaluate(
+      () => document.querySelector(`h1.ui-search-breadcrumb__title`).textContent
+    );
+
+    // console.log(dataPortal);
 
     // // NextPage
     // await page.click('a[title="Siguiente"]');
@@ -44,11 +53,14 @@ module.exports = async function navigate() {
 
     // await browser.close();
 
-    console.log("Browser closed");
+    console.log(`\nBrowser closed, route created, first route ${firstUrl}`);
+    console.log(`Search type: ${type}`);
+    console.log(`Links to scrap: ${dataPortal.length}`);
 
     return dataPortal;
   } catch (err) {
-    console.log("Error, pasa por aca?");
+    console.log("Error in createRoute()");
+    console.log(err);
   }
 };
 
