@@ -36,9 +36,13 @@ module.exports = async function navigate() {
       return results;
     });
 
-    // console.log(dataPortal);
+    console.log(dataPortal);
 
-    await browser.close();
+    // // NextPage
+    // await page.click('a[title="Siguiente"]');
+    // await page.click('a[title="Siguiente"]');
+
+    // await browser.close();
 
     console.log("Browser closed");
 
@@ -47,3 +51,9 @@ module.exports = async function navigate() {
     console.log("Error, pasa por aca?");
   }
 };
+
+// function sleep(ms) {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, ms);
+//   });
+// }
