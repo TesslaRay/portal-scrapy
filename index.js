@@ -15,15 +15,16 @@ async function mainScrap() {
   /**
    * Navigate for Portal Inmobiliario
    */
-  // let linkPage = await createRoute();
+  let linkPage = await createRoute();
 
   /**
    * Scrap Portal Inmobiliario web page
    */
-  await scrapPropertyFromUrl(urlExample);
-  // for (let i = 0; i < linkPage.length; i++) {
-  //   await scrapPropertyFromUrl(linkPage[i].url);
-  // }
+  // await scrapPropertyFromUrl(urlExample);
+  for (let i = 0; i < linkPage.length; i++) {
+    console.log(`\nPROPERTY SCRAPED NUMBER: ${i}`);
+    await scrapPropertyFromUrl(linkPage[i].url);
+  }
 }
 
 mainScrap();

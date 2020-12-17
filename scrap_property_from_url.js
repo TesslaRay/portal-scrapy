@@ -43,7 +43,6 @@ module.exports = async function scrapPropertyFromUrl(url) {
     );
 
     console.log(prize);
-    console.log(prize.length);
 
     let prizeUfWithoutPoint = 0;
     let prizeClpWithoutPoint = 0;
@@ -66,8 +65,6 @@ module.exports = async function scrapPropertyFromUrl(url) {
 
     let bedrooms = attributes[1][0];
     let bathrooms = attributes[2][0];
-
-    console.log();
 
     let prizeUfForSquareMeter =
       parseInt(prizeUfWithoutPoint) / parseInt(squareMeters);
@@ -121,7 +118,7 @@ module.exports = async function scrapPropertyFromUrl(url) {
         }),
       };
 
-      fetch("https://api.monday.com/v2", {
+      await fetch("https://api.monday.com/v2", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
