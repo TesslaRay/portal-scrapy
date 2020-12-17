@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 
 let firstUrl = `https://www.portalinmobiliario.com/venta/departamento/propiedades-usadas/santiago-metropolitana`;
-let numberOfPage = 3;
+let numberOfPage = 1;
 
 /**
  * Create route to navigate in Portal Inmobiliario

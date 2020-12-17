@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const fetch = require("node-fetch");
 
 /**
  * Scrapping from Portal Inmobiliario
@@ -30,22 +31,49 @@ module.exports = async function scrapPropertyFromUrl(url) {
 
     console.log(address);
 
-    const prizeUF = await page.$$eval(".item-price  * span", (elements) =>
+    const prize = await page.$$eval(".item-price  * span", (elements) =>
       elements.map((el) => el.innerText)
     );
 
-    console.log(prizeUF);
+    console.log(prize);
+    console.log(prize.length);
+
+    let prizeUfWithoutPoint = 0;
+    let prizeClpWithoutPoint = 0;
+
+    if (prize.length > 2) {
+      prizeClpWithoutPoint = prize[3].split(".").join("");
+      prizeUfWithoutPoint = prize[1].split(".").join("");
+    } else {
+      prizeClpWithoutPoint = prize[1].split(".").join("");
+    }
 
     const attributes = await page.$$eval(".item-attributes  * dd", (elements) =>
       elements.map((el) => el.innerText)
     );
 
     console.log(attributes);
+    // console.log(attributes[0][0] + attributes[0][1]);
+
+    let squareMeters = attributes[0][0] + attributes[0][1];
+
+    let bedrooms = attributes[1][0];
+    let bathrooms = attributes[2][0];
+
+    console.log();
+
+    let prizeUfForSquareMeter =
+      parseInt(prizeUfWithoutPoint) / parseInt(squareMeters);
+
+    let prizeClpForSquareMeter =
+      parseInt(prizeClpWithoutPoint) / parseInt(squareMeters);
 
     const sellerName = await page.$$eval(
       ".vip-section-seller-info * span",
       (elements) => elements.map((el) => el.innerText)
     );
+
+    let timeInMarket = 0;
 
     if (sellerName.length > 1) {
       console.log(`Vendido por: ${sellerName[0]}`);
@@ -57,13 +85,49 @@ module.exports = async function scrapPropertyFromUrl(url) {
       var date2 = new Date();
 
       // To calculate the time difference of two dates
-      let diferenceInTime = parseInt(
-        Math.abs(date1 - date2) / (1000 * 60 * 60 * 24)
-      );
+      timeInMarket = parseInt(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
 
-      console.log(`Días en la plataforma: ${diferenceInTime}\n`);
+      console.log(`Días en la plataforma: ${timeInMarket}\n`);
     } else {
       console.log("Vendido por Corredora o Inmobiliaria \n");
+    }
+
+    // Write in Monday.com
+    if (sellerName.length > 1) {
+      let query5 =
+        "mutation ($myItemName: String!, $columnVals: JSON!) { create_item (board_id:915971149, item_name:$myItemName, column_values:$columnVals) { id } }";
+      let vars = {
+        myItemName: address,
+        columnVals: JSON.stringify({
+          status: { label: "Encontrada" },
+          link: { url: url, text: "Link" },
+          numbers0: timeInMarket.toString(),
+          type: { label: "Apartamento" },
+          numbers: prizeUfWithoutPoint,
+          numbers3: prizeClpWithoutPoint,
+          numbers6: squareMeters,
+          numbers9: prizeUfForSquareMeter.toString(),
+          numbers1: prizeClpForSquareMeter.toString(),
+          status8: { label: "Venta" },
+          status0: { label: bedrooms },
+          status_14: { label: bathrooms },
+        }),
+      };
+
+      fetch("https://api.monday.com/v2", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjkzNzQ0MTE3LCJ1aWQiOjExNjE4ODQwLCJpYWQiOiIyMDIwLTEyLTE3VDAzOjExOjI2LjAwMFoiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjo1MjM2NjE0LCJyZ24iOiJ1c2UxIn0.vUB18bWCby_cH5ruRyd6AvbrrIjcX4GsfPsXI4JRNA0",
+        },
+        body: JSON.stringify({
+          query: query5,
+          variables: JSON.stringify(vars),
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => console.log(JSON.stringify(res, null, 2)));
     }
 
     await browser.close();
