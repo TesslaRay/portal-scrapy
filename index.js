@@ -16,7 +16,6 @@ async function mainScrap() {
   /**
    * Scrap Portal Inmobiliario web page
    */
-
   // await scrapPropertyFromUrl(urlExample);
   for (let i = 0; i < linkPage.length; i++) {
     await scrapPropertyFromUrl(linkPage[i].url);

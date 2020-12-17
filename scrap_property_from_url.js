@@ -8,15 +8,8 @@ const puppeteer = require("puppeteer");
 module.exports = async function scrapPropertyFromUrl(url) {
   try {
     let browser = await puppeteer.launch({
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-infobars",
-        "--window-position=0,0",
-        "--ignore-certifcate-errors",
-        "--ignore-certifcate-errors-spki-list",
-        "--incognito",
-      ],
+      args: ["--disable-setuid-sandbox"],
+      ignoreHTTPSErrors: true,
       headless: true,
     });
 
