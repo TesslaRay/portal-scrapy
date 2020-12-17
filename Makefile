@@ -1,5 +1,10 @@
 VERSION := $$(cat package.json | grep version | sed 's/"/ /g' | awk {'print $$3'})
 
+DEV := env.json
+ENV := $(DEV)
+
+MONDAY_TOKEN := $$(cat $(ENV) | grep MONDAY_TOKEN | sed 's/"/ /g' | awk {'print $$3'})
+
 SVC=portal-inmobiliario-scraping
 PORT=8000
 
@@ -12,6 +17,6 @@ init i:
 
 run r:
 	@echo "[Scraping] Scraping service "
-	@PORT=$(PORT) node index.js
+	@PORT=$(PORT) MONDAY_TOKEN="$(MONDAY_TOKEN)" node index.js
 	
 .PHONY: version v init i run r

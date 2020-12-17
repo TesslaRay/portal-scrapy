@@ -1,6 +1,13 @@
 const puppeteer = require("puppeteer");
 const fetch = require("node-fetch");
 
+const MONDAY_TOKEN = process.env.MONDAY_TOKEN;
+
+if (MONDAY_TOKEN === undefined) {
+  console.log("[Error] Monday Key in the env variables");
+  process.exit(1);
+}
+
 /**
  * Scrapping from Portal Inmobiliario
  * @description Scrarp information from Portal Inmobiliario
@@ -118,8 +125,7 @@ module.exports = async function scrapPropertyFromUrl(url) {
         method: "post",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjkzNzQ0MTE3LCJ1aWQiOjExNjE4ODQwLCJpYWQiOiIyMDIwLTEyLTE3VDAzOjExOjI2LjAwMFoiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjo1MjM2NjE0LCJyZ24iOiJ1c2UxIn0.vUB18bWCby_cH5ruRyd6AvbrrIjcX4GsfPsXI4JRNA0",
+          Authorization: MONDAY_TOKEN,
         },
         body: JSON.stringify({
           query: query5,
